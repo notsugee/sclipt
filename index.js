@@ -71,8 +71,8 @@ async function main(){
   const commandArg = args[1];
   if(!command){
     console.log(chalk.bold.blue("Welcome to sclipt! Your CLI Snippet Manager!"));
-    console.log(chalk.dim("Usage: ./index.js <command> [options]"));
-    console.log(chalk.dim("Try: ./index.js help"));
+    console.log(chalk.dim("Usage: sclipt <command> [options]"));
+    console.log(chalk.dim("Try: sclipt help"));
     return;
   }
 
@@ -111,7 +111,7 @@ async function main(){
 
     case 'help':
       // console.log(chalk.cyan("\n--- sclipt ---"));
-      const helpMessage = `${chalk.bold('Usage:')} ${chalk.yellow('./index.js add/list/view/delete [options]')}`;
+      const helpMessage = `${chalk.bold('Usage:')} ${chalk.yellow('sclipt add/list/view/delete [options]')}`;
       console.log(boxen(helpMessage, {
         padding: 1,
         margin: 1,
@@ -126,7 +126,7 @@ async function main(){
 
     default:
       console.log(chalk.red(`Unknown command: '${command}'.`));
-      console.log(chalk.dim("Try: ./index.js help"));
+      console.log(chalk.dim("Try: sclipt help"));
       break;
   }
 }
