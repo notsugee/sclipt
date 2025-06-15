@@ -2,6 +2,7 @@
 
 const fs = require('fs').promises;
 const readline = require('readline/promises');
+const chalk = require('chalk').default;
 
 const SNIPPET_FILE = 'snippets.json';
 
@@ -19,6 +20,33 @@ async function prompt(query){
   rl.close();
   
   return answer;
+}
+
+async function multilinePrompt(query){
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const END_KEYWORD = "scliptend";
+
+  console.log(query);
+  console.log(chalk.dim(`(Enter your content. Type ${END_KEYWORD} on a new line and press Enter to finish.)`));
+  
+  let lines = [];
+  const contentPromise = new Promise(resolve => {
+    rl.on('line', (line) => {
+      if(line.trim().toLowerCase() === END_KEYWORD){
+        rl.close();
+        resolve(lines.join('\n'));
+      }
+      else{
+        lines.push(line);
+      }
+    });
+  });
+  rl.write('');
+  return contentPromise;
 }
 
 async function loadSnippets(){
@@ -96,7 +124,7 @@ async function main(){
 async function addSnippet(){
   console.log("\n--- Add Snippet ---");
   const title = await prompt("Enter snippet title: ");
-  const content = await prompt("Enter snippet content (paste and press Enter): ");
+  const content = await multilinePrompt("Enter snippet content (paste and press Enter): ");
   const tagsInput = await prompt("Enter tags (comma-separated): ");
 
   const tags = tagsInput.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag != '');
