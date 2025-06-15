@@ -3,6 +3,7 @@
 const fs = require('fs').promises;
 const readline = require('readline/promises');
 const chalk = require('chalk').default;
+const boxen = require('boxen').default;
 
 const SNIPPET_FILE = 'snippets.json';
 
@@ -28,15 +29,14 @@ async function multilinePrompt(query){
     output: process.stdout,
   });
 
-  const END_KEYWORD = "scliptend";
 
   console.log(query);
-  console.log(chalk.dim(`(Enter your content. Type ${END_KEYWORD} on a new line and press Enter to finish.)`));
+  console.log(chalk.dim(`>>> (Type 'scliptend' on a new line and press Enter to finish.)`));
   
   let lines = [];
   const contentPromise = new Promise(resolve => {
     rl.on('line', (line) => {
-      if(line.trim().toLowerCase() === END_KEYWORD){
+      if(line.trim().toLowerCase() === "scliptend"){
         rl.close();
         resolve(lines.join('\n'));
       }
@@ -70,9 +70,9 @@ async function saveSnippets(snippets){
 async function main(){
   const commandArg = args[1];
   if(!command){
-    console.log("Welcome to sclipt! Your CLI Snippet Manager!");
-    console.log("Usage: ./index.js <command> [options]");
-    console.log("Try: ./index.js help");
+    console.log(chalk.bold.blue("Welcome to sclipt! Your CLI Snippet Manager!"));
+    console.log(chalk.dim("Usage: ./index.js <command> [options]"));
+    console.log(chalk.dim("Try: ./index.js help"));
     return;
   }
 
@@ -87,7 +87,7 @@ async function main(){
 
     case 'view':
       if(!commandArg){
-        console.log("Please provide a snippet ID to view.");
+        console.log(chalk.red("Please provide a snippet ID to view."));
         break;
       }
       await viewSnippet(commandArg);
@@ -95,7 +95,7 @@ async function main(){
 
     case 'delete':
       if(!commandArg){
-        console.log("Please provide a snippet ID to delete.");
+        console.log(chalk.red("Please provide a snippet ID to delete."));
         break;
       }
       await deleteSnippet(commandArg);
@@ -103,34 +103,43 @@ async function main(){
 
     case 'search':
       if(!commandArg){
-        console.log("Please provide a search query.");
+        console.log(chalk.red("Please provide a search query."));
         break;
       }
       await searchSnippets(commandArg, args.slice(1));
       break;
 
     case 'help':
-      console.log("Help text will go here.");
-      console.log("Available commands: add, list, view, help");
+      console.log(chalk.cyan("\n--- sclipt ---"));
+      console.log(`\n${chalk.bold('Usage:')} ${chalk.yellow('./index.js add/list/view/delete [options]')}`);
+      console.log(chalk.cyan("----------------------------\n"));
       break;
 
     default:
-      console.log(`Unknown command: '${command}'.`);
-      console.log("Try: ./index.js help");
+      console.log(chalk.red(`Unknown command: '${command}'.`));
+      console.log(chalk.dim("Try: ./index.js help"));
       break;
   }
 }
 
 async function addSnippet(){
-  console.log("\n--- Add Snippet ---");
-  const title = await prompt("Enter snippet title: ");
-  const content = await multilinePrompt("Enter snippet content (paste and press Enter): ");
-  const tagsInput = await prompt("Enter tags (comma-separated): ");
+//  console.log(chalk.magenta("\n--- Add Snippet ---"));
+  const title = await prompt(chalk.green.bold('>>> ') + "Enter snippet title: ");
+  const content = await multilinePrompt(chalk.magenta.bold('>>> ') + "Enter snippet content: ");
+  const tagsInput = await prompt(chalk.yellow.bold('>>> ') + "Enter tags (comma-separated): ");
 
   const tags = tagsInput.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag != '');
 
   if(!title.trim() || !content.trim()){
-    console.log("Title and content cannot be empty. Snippet not added.");
+    const failedAdd = chalk.red("Title and content cannot be empty. Snippet not added.");
+    console.log(boxen(failedAdd, {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'single',
+      borderColor: 'red',
+      title: 'Failed',
+      titleAlignment: 'center'
+    }));
     return;
   }
 
@@ -148,67 +157,134 @@ async function addSnippet(){
 
   await saveSnippets(snippets);
 
-  console.log(`\nSnippet '${title}' added successfully with ID: ${newSnippet.id}`);
-  console.log("----------------------------\n");
+  const addMessage = `\nSnippet '${chalk.bold(title)}' added successfully with ID: ${chalk.yellow(newSnippet.id)}`;
+  console.log(boxen(addMessage, {
+    padding: 1,
+    margin: 1,
+    borderStyle: 'single',
+    borderColor: 'green',
+    title: 'Snippet Added',
+    titleAlignment: 'center'
+  }));
+  // console.log(chalk.magenta("----------------------------\n"));
 }
 
 async function listSnippets(){
-  console.log("\n--- Your Snippets ---");
+  //  console.log(chalk.blue("\n--- Your Snippets ---"));
   const snippets = await loadSnippets();
 
   if(snippets.length === 0){
-    console.log("No snippets found. Add some with: ./index.js add");
-    console.log("----------------------------\n");
+    const noSnippetsMsg = chalk.dim("No snippets found. Add some with: ") + chalk.yellow("./index.js add");
+//    console.log(chalk.blue("----------------------------\n"));
+    console.log(boxen(noSnippetsMsg, {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'yellow',
+      title: 'No Snippets',
+      titleAlignment: 'center'
+    }));
     return;
   }
 
+  const listContentLines = [];
   snippets.forEach(snippet => {
-    console.log(`ID: ${snippet.id}`);
-    console.log(`Title: ${snippet.title}`);
-    console.log(`Created: ${new Date(snippet.createdAt).toLocaleString()}`);
-    console.log(`Tags: ${snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None'}`);
-    console.log("----------------------------");
+    listContentLines.push(`ID: ${chalk.yellow(snippet.id)}`);
+    listContentLines.push(`Title: ${chalk.bold(snippet.title)}`);
+    listContentLines.push(`Created: ${chalk.dim(new Date(snippet.createdAt).toLocaleString())}`);
+    listContentLines.push(`Tags: ${chalk.green(snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None')}`);
+    listContentLines.push(chalk.blue("----------------------------"));
   });
-  console.log("----------------------------\n");
+
+ // console.log(chalk.blue("----------------------------\n"));
+    if(listContentLines.length > 0){
+    listContentLines.pop();
+  }
+
+  console.log(boxen(listContentLines.join('\n'), {
+    padding: 1,
+    margin: 1,
+    borderStyle: 'round',
+    borderColor: 'blue',
+    title: 'Your Snippets',
+    titleAlignment: 'center'
+  }));
 }
 
 async function viewSnippet(id){
-  console.log(`\n--- Snippet (ID: ${id}) ---`);
+  // console.log(chalk.blue(`\n--- Snippet (ID: ${id}) ---`));
   const snippets = await loadSnippets();
   const snippet = snippets.find(s => s.id === id);
 
   if(!snippet){
-    console.log("Snippet not found.");
-    console.log("----------------------------\n");
+    const notFoundMsg = chalk.red("Snippet not found.");
+   // console.log(chalk.dim("----------------------------\n"));
+    console.log(boxen(notFoundMsg, {
+    padding: 1,
+    margin: 1,
+    borderStyle: 'single',
+    borderColor: 'red',
+    title: 'Error',
+    titleAlignment: 'center'
+  }));
     return;
   }
 
-  console.log(`Title: ${snippet.title}`);
-  console.log(`Created: ${new Date(snippet.createdAt).toLocaleString()}`);
-  console.log("\n--- Content ---");
-  console.log(snippet.content);
-  console.log("----------------------------\n");
+  const viewContent = [
+  `Title: ${chalk.bold(snippet.title)}`,
+  `Created: ${chalk.dim(new Date(snippet.createdAt).toLocaleString())}`,
+  '',
+  chalk.cyan.bold("\n--- Content ---"),
+  '',
+  snippet.content
+  // console.log(chalk.cyan("----------------------------\n"));
+  ].join('\n');
+
+  console.log(boxen(viewContent, {
+    padding: 1,
+    margin: 1,
+    borderStyle: 'none',
+    borderColor: 'green',
+    title: `Snippet ID: ${chalk.yellow(id)}`,
+    titleAlignment: 'center'
+  }));
 }
 
 async function deleteSnippet(id){
-  console.log(`\n--- Deleting Snippet (ID: ${id}) ---`);
+  // console.log(chalk.red(`\n--- Deleting Snippet (ID: ${chalk.yellow(id)}) ---`));
   const snippets = await loadSnippets();
   
   const len = snippets.length;
   const filteredSnippets = snippets.filter(s => s.id !== id);
 
+  let deleteMessage;
+  let borderColor;
+  let boxTitle;
+
   if (filteredSnippets.length === len){
-    console.log(`No snippet found with ID: ${id}`);
+    deleteMessage = chalk.yellow(`No snippet found with ID: ${id}`);
+    borderColor = 'yellow';
+    boxTitle = 'Deletion Failed';
   }
   else{
     await saveSnippets(filteredSnippets);
-    console.log(`Snippet with ID: ${id} deleted successfully.`);
+    deleteMessage = chalk.green(`Snippet with ID: ${id} deleted successfully.`);
+    borderColor = 'green';
+    boxTitle = 'Deleted';
   }
-  console.log("----------------------------\n");
+  // console.log(chalk.red("----------------------------\n"));
+  console.log(boxen(deleteMessage, {
+    padding: 1,
+    margin: 1,
+    borderStyle: 'single',
+    borderColor: borderColor,
+    title: boxTitle,
+    titleAlignment: 'center'
+  }));
 }
 
 async function searchSnippets(query, additionalArgs){
-  console.log(`\n--- Searching for tag: '${additionalArgs[1]}' ---`);
+  // console.log(chalk.blue(`\n--- Searching for tag: '${additionalArgs[1]}' ---`));
   const snippets = await loadSnippets();
 
   let requiredTag = additionalArgs[1];
@@ -217,23 +293,40 @@ async function searchSnippets(query, additionalArgs){
     const matchesTag = requiredTag ? (snippet.tags && snippet.tags.includes(requiredTag)) : false;
     return matchesTag;
   });
-
+  
+  let noResultMsg;
   if(foundSnippets.length === 0){
-    console.log(`No snippet found with the tag '${requiredTag}'`);
-    console.log("----------------------------\n");
+    noResultMsg = chalk.yellow(`No snippet found with the tag '${requiredTag}'`);
+    // console.log(chalk.dim("----------------------------\n"));
+    console.log(boxen(noResultMsg, {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'yellow',
+      title: 'No Results',
+      titleAlignment: 'center'
+    }));
     return;
   }
   else{
+    const searchResults = [chalk.green(`Found ${chalk.bold(foundSnippets.length)} snippets`)];
     foundSnippets.forEach(snippet => {
-      console.log(`Found ${foundSnippets.length} snippets`);
-      console.log(`ID: ${snippet.id}`);
-      console.log('Title: ${snippet.title}');
-      console.log(`Tags: ${snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None'}`);
-      console.log("----------------------------");
+      searchResults.push(`ID: ${chalk.yellow(snippet.id)}`);
+      searchResults.push(`Title: ${chalk.bold(snippet.title)}`);
+      searchResults.push(`Tags: ${chalk.green(snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None')}`);
+      searchResults.push(chalk.dim("----------------------------"));
+    });
+    searchResults.pop();
 
-    })
-      console.log("----------------------------\n");
-      }
+    console.log(boxen(searchResults.join('\n'), {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'doubleSingle',
+      borderColor: 'blue',
+      title: 'Search Results',
+      titleAlignment: 'center'
+    }));
+  }
 }
 
 main();
