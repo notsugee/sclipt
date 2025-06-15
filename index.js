@@ -40,7 +40,7 @@ async function saveSnippets(snippets){
 
 
 async function main(){
-  const id = args[1];
+  const commandArg = args[1];
   if(!command){
     console.log("Welcome to sclipt! Your CLI Snippet Manager!");
     console.log("Usage: ./index.js <command> [options]");
@@ -58,19 +58,27 @@ async function main(){
       break;
 
     case 'view':
-      if(!id){
+      if(!commandArg){
         console.log("Please provide a snippet ID to view.");
         break;
       }
-      await viewSnippet(id);
+      await viewSnippet(commandArg);
       break;
 
     case 'delete':
-      if(!id){
+      if(!commandArg){
         console.log("Please provide a snippet ID to delete.");
         break;
       }
-      await deleteSnippet(id);
+      await deleteSnippet(commandArg);
+      break;
+
+    case 'search':
+      if(!commandArg){
+        console.log("Please provide a search query.");
+        break;
+      }
+      await searchSnippets(commandArg, args.slice(1));
       break;
 
     case 'help':
@@ -89,6 +97,9 @@ async function addSnippet(){
   console.log("\n--- Add Snippet ---");
   const title = await prompt("Enter snippet title: ");
   const content = await prompt("Enter snippet content (paste and press Enter): ");
+  const tagsInput = await prompt("Enter tags (comma-separated): ");
+
+  const tags = tagsInput.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag != '');
 
   if(!title.trim() || !content.trim()){
     console.log("Title and content cannot be empty. Snippet not added.");
@@ -102,6 +113,7 @@ async function addSnippet(){
     title: title.trim(),
     content: content.trim(),
     createdAt: new Date().toISOString(),
+    tags: tags,
   }
 
   snippets.push(newSnippet);
@@ -126,6 +138,7 @@ async function listSnippets(){
     console.log(`ID: ${snippet.id}`);
     console.log(`Title: ${snippet.title}`);
     console.log(`Created: ${new Date(snippet.createdAt).toLocaleString()}`);
+    console.log(`Tags: ${snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None'}`);
     console.log("----------------------------");
   });
   console.log("----------------------------\n");
@@ -164,6 +177,35 @@ async function deleteSnippet(id){
     console.log(`Snippet with ID: ${id} deleted successfully.`);
   }
   console.log("----------------------------\n");
+}
+
+async function searchSnippets(query, additionalArgs){
+  console.log(`\n--- Searching for tag: '${additionalArgs[1]}' ---`);
+  const snippets = await loadSnippets();
+
+  let requiredTag = additionalArgs[1];
+
+  const foundSnippets = snippets.filter(snippet => {
+    const matchesTag = requiredTag ? (snippet.tags && snippet.tags.includes(requiredTag)) : false;
+    return matchesTag;
+  });
+
+  if(foundSnippets.length === 0){
+    console.log(`No snippet found with the tag '${requiredTag}'`);
+    console.log("----------------------------\n");
+    return;
+  }
+  else{
+    foundSnippets.forEach(snippet => {
+      console.log(`Found ${foundSnippets.length} snippets`);
+      console.log(`ID: ${snippet.id}`);
+      console.log('Title: ${snippet.title}');
+      console.log(`Tags: ${snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None'}`);
+      console.log("----------------------------");
+
+    })
+      console.log("----------------------------\n");
+      }
 }
 
 main();
