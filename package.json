@@ -1,6 +1,6 @@
 {
   "name": "sclipt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool to manage your code snippets.",
   "main": "index.js",
   "bin": {
