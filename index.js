@@ -110,9 +110,18 @@ async function main(){
       break;
 
     case 'help':
-      console.log(chalk.cyan("\n--- sclipt ---"));
-      console.log(`\n${chalk.bold('Usage:')} ${chalk.yellow('./index.js add/list/view/delete [options]')}`);
-      console.log(chalk.cyan("----------------------------\n"));
+      // console.log(chalk.cyan("\n--- sclipt ---"));
+      const helpMessage = `${chalk.bold('Usage:')} ${chalk.yellow('./index.js add/list/view/delete [options]')}`;
+      console.log(boxen(helpMessage, {
+        padding: 1,
+        margin: 1,
+        borderStyle: 'single',
+        borderColor: 'green',
+        title: 'help',
+        titleAlignment: 'center'
+      }));
+      
+      // console.log(chalk.cyan("----------------------------\n"));
       break;
 
     default:
