@@ -1,15 +1,31 @@
 {
   "name": "sclipt",
   "version": "1.0.0",
-  "description": "",
+  "description": "A CLI tool to manage your code snippets.",
   "main": "index.js",
+  "bin": {
+    "sclipt": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "cli",
+    "snippet",
+    "code",
+    "manager",
+    "snippet-manager",
+    "developer-tools",
+    "terminal",
+    "productivity"
+  ],
+  "author": "notsugee",
+  "license": "MIT",
   "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notsugee/sclipt.git"
+  },
   "dependencies": {
     "boxen": "^8.0.1",
     "chalk": "^5.4.1"
