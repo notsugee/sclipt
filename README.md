@@ -4,6 +4,7 @@ sclipt is a command-line interface tool that helps you quickly store, list, view
 
 ## ✨ Features
 - **Add Snippets**: Interactively add new snippets with a title, multi-line content, and tags.
+![sclipt add command]{media/2.png}
 - **List All Snippets**: Get a quick overview of all your saved snippets with their IDs, titles, and tags.
 - **View Snippet Details**: Display the full content of any snippet by its unique ID.
 - **Delete Snippets**: Easily remove outdated or unwanted snippets using their ID.
