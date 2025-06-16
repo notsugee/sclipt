@@ -1,14 +1,19 @@
 # sclipt - Your CLI Snippet Manager 🚀
 
 sclipt is a command-line interface tool that helps you quickly store, list, view, delete, and search your code snippets right from your terminal. Designed for developers, it provides a fast and efficient way to manage reusable pieces of code without leaving your workflow.
+![sclipt](media/1.png)
 
 ## ✨ Features
 - **Add Snippets**: Interactively add new snippets with a title, multi-line content, and tags.
 ![sclipt add command](media/2.png)
 - **List All Snippets**: Get a quick overview of all your saved snippets with their IDs, titles, and tags.
+![sclipt list command](media/3.png)
 - **View Snippet Details**: Display the full content of any snippet by its unique ID.
+![sclipt view command](media/5.png)
 - **Delete Snippets**: Easily remove outdated or unwanted snippets using their ID.
+![sclipt delete command](media/6.png)
 - **Search by Tag**: Find snippets efficiently by specifying a tag (e.g., `js`, `react`, `node`).
+![sclipt search command](media/4.png)
 - **Beautiful Output**: Leverages `chalk` for vibrant colors and `boxen` for elegant terminal boxes, making your CLI experience visually appealing.
 - **Multi-line Input**: Supports multi-line code input, perfect for storing larger code blocks.
 
