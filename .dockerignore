@@ -1,0 +1,11 @@
+node_modules/
+.git/
+.gitignore
+.npmignore
+.vscode/
+npm-debug.log*
+Dockerfile
+README.md
+LICENSE
+snippets.json 
+              

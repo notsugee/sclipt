@@ -66,7 +66,6 @@ async function saveSnippets(snippets){
 }
 
 
-
 async function main(){
   const commandArg = args[1];
   if(!command){
@@ -110,7 +109,6 @@ async function main(){
       break;
 
     case 'help':
-      // console.log(chalk.cyan("\n--- sclipt ---"));
       const helpMessage = `${chalk.bold('Usage:')} ${chalk.yellow('sclipt add/list/view/delete [options]')}`;
       console.log(boxen(helpMessage, {
         padding: 1,
@@ -121,7 +119,6 @@ async function main(){
         titleAlignment: 'center'
       }));
       
-      // console.log(chalk.cyan("----------------------------\n"));
       break;
 
     default:
@@ -132,12 +129,11 @@ async function main(){
 }
 
 async function addSnippet(){
-//  console.log(chalk.magenta("\n--- Add Snippet ---"));
   const title = await prompt(chalk.green.bold('>>> ') + "Enter snippet title: ");
   const content = await multilinePrompt(chalk.magenta.bold('>>> ') + "Enter snippet content: ");
   const tagsInput = await prompt(chalk.yellow.bold('>>> ') + "Enter tags (comma-separated): ");
 
-  const tags = tagsInput.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag != '');
+  const tags = tagsInput.split(',').map(tag => tag.trim().toLowerCase());
 
   if(!title.trim() || !content.trim()){
     const failedAdd = chalk.red("Title and content cannot be empty. Snippet not added.");
@@ -175,16 +171,13 @@ async function addSnippet(){
     title: 'Snippet Added',
     titleAlignment: 'center'
   }));
-  // console.log(chalk.magenta("----------------------------\n"));
 }
 
 async function listSnippets(){
-  //  console.log(chalk.blue("\n--- Your Snippets ---"));
   const snippets = await loadSnippets();
 
   if(snippets.length === 0){
-    const noSnippetsMsg = chalk.dim("No snippets found. Add some with: ") + chalk.yellow("./index.js add");
-//    console.log(chalk.blue("----------------------------\n"));
+    const noSnippetsMsg = chalk.dim("No snippets found. Add some with: ") + chalk.yellow("sclipt add");
     console.log(boxen(noSnippetsMsg, {
       padding: 1,
       margin: 1,
@@ -196,21 +189,20 @@ async function listSnippets(){
     return;
   }
 
-  const listContentLines = [];
+  const contentList = [];
   snippets.forEach(snippet => {
-    listContentLines.push(`ID: ${chalk.yellow(snippet.id)}`);
-    listContentLines.push(`Title: ${chalk.bold(snippet.title)}`);
-    listContentLines.push(`Created: ${chalk.dim(new Date(snippet.createdAt).toLocaleString())}`);
-    listContentLines.push(`Tags: ${chalk.green(snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None')}`);
-    listContentLines.push(chalk.blue("----------------------------"));
+    contentList.push(`ID: ${chalk.yellow(snippet.id)}`);
+    contentList.push(`Title: ${chalk.bold(snippet.title)}`);
+    contentList.push(`Created: ${chalk.dim(new Date(snippet.createdAt).toLocaleString())}`);
+    contentList.push(`Tags : ${chalk.green(snippet.tags && snippet.tags.length > 0 ? snippet.tags.join(', ') : 'None')}`);
+    contentList.push(chalk.blue("----------------------------"));
   });
 
- // console.log(chalk.blue("----------------------------\n"));
-    if(listContentLines.length > 0){
-    listContentLines.pop();
+    if(contentList.length > 0){
+    contentList.pop();
   }
 
-  console.log(boxen(listContentLines.join('\n'), {
+  console.log(boxen(contentList.join('\n'), {
     padding: 1,
     margin: 1,
     borderStyle: 'round',
@@ -221,13 +213,11 @@ async function listSnippets(){
 }
 
 async function viewSnippet(id){
-  // console.log(chalk.blue(`\n--- Snippet (ID: ${id}) ---`));
   const snippets = await loadSnippets();
   const snippet = snippets.find(s => s.id === id);
 
   if(!snippet){
     const notFoundMsg = chalk.red("Snippet not found.");
-   // console.log(chalk.dim("----------------------------\n"));
     console.log(boxen(notFoundMsg, {
     padding: 1,
     margin: 1,
@@ -246,7 +236,6 @@ async function viewSnippet(id){
   chalk.cyan.bold("\n--- Content ---"),
   '',
   snippet.content
-  // console.log(chalk.cyan("----------------------------\n"));
   ].join('\n');
 
   console.log(boxen(viewContent, {
@@ -260,7 +249,6 @@ async function viewSnippet(id){
 }
 
 async function deleteSnippet(id){
-  // console.log(chalk.red(`\n--- Deleting Snippet (ID: ${chalk.yellow(id)}) ---`));
   const snippets = await loadSnippets();
   
   const len = snippets.length;
@@ -281,7 +269,6 @@ async function deleteSnippet(id){
     borderColor = 'green';
     boxTitle = 'Deleted';
   }
-  // console.log(chalk.red("----------------------------\n"));
   console.log(boxen(deleteMessage, {
     padding: 1,
     margin: 1,
@@ -293,7 +280,6 @@ async function deleteSnippet(id){
 }
 
 async function searchSnippets(query, additionalArgs){
-  // console.log(chalk.blue(`\n--- Searching for tag: '${additionalArgs[1]}' ---`));
   const snippets = await loadSnippets();
 
   let requiredTag = additionalArgs[1];
@@ -306,7 +292,6 @@ async function searchSnippets(query, additionalArgs){
   let noResultMsg;
   if(foundSnippets.length === 0){
     noResultMsg = chalk.yellow(`No snippet found with the tag '${requiredTag}'`);
-    // console.log(chalk.dim("----------------------------\n"));
     console.log(boxen(noResultMsg, {
       padding: 1,
       margin: 1,
