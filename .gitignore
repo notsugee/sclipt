@@ -2,3 +2,5 @@ snippets.json
 node_modules/
 package/
 *.tgz
+Dockerfile
+.dockerignore
